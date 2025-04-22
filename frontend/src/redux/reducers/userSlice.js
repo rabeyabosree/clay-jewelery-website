@@ -72,6 +72,29 @@ export const resetNewPassword = createAsyncThunk(
   }
 );
 
+//ger user activity
+export const createActivity = createAsyncThunk(
+  "products/createProduct",
+  async ({ action, details }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/activity`, // Backend endpoint
+        { action, details },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      return response.data.product; // Return the created product
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Something went wrong");
+    }
+  }
+);
+
 // Delete User
 export const deleteAccount = createAsyncThunk(
   "user/deleteAccount",
@@ -88,9 +111,9 @@ export const deleteAccount = createAsyncThunk(
   }
 );
 
-
+const userFromStorage = JSON.parse(localStorage.getItem("auth"));
 const initialState = {
-  user: null,
+  user: userFromStorage || null,
   loading: false,
   error: null,
   message: "",
@@ -125,7 +148,7 @@ const userSlice = createSlice({
         state.loading = true;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.user = action.payload;
+        state.user = action.payload.user;
         localStorage.setItem("auth", JSON.stringify(action.payload.user));
         state.loading = false;
         state.error = null;

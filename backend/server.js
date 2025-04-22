@@ -33,7 +33,16 @@ const mongoConnection = () => {
 mongoConnection();
 
 const userRoute = require("./routes/userRoute");
+const productRoute = require("./routes/productsRoute")
+const adminRoute = require("./routes/adminRoutes")
+const orderRoute = require("./routes/orderRoute");
+const notificationRoute = require("./routes/notificationRoute");
 
+
+app.use("/api/products", productRoute);
+app.use("/api/admin", adminRoute);
+app.use("/api/orders", orderRoute)
+app.use("/api/notifications", notificationRoute)
 app.use("/api/users", userRoute);
 
 const multipleUsers = new Map()

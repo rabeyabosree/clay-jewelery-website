@@ -13,6 +13,10 @@ import AllProducts from './pages/admin/AllProducts'
 import GetAllUsers from './pages/admin/GetAllUsers'
 import UsersActivity from './pages/admin/UsersActivity'
 import DeleteAccount from './pages/admin/DeleteAccount'
+import GetOrders from './pages/admin/GetOrders';
+import Profile from './pages/profile/Profile';
+import Products from './pages/products/Products'
+import SingleProduct from './pages/products/SingleProduct'
 
 function App() {
 
@@ -30,19 +34,19 @@ function App() {
 
         <Route path='/cart' element={<Cart />} />
         <Route path='/notification' element={<Notifications />} />
+        <Route path='/products' element={<Products />} />
+        <Route path='/products/:id' element={<SingleProduct/>} />
 
 
         <Route path='/dashboard' element={<AdminDashboard />}>
           <Route path='create-product' element={<CreateProducts />} />
           <Route path='all-products' element={<AllProducts />} />
-          <Route path='all-users' element={<GetAllUsers/>} />
+          <Route path='all-users' element={<GetAllUsers />} />
           <Route path='users-activity' element={<UsersActivity />} />
+          <Route path='Orders' element={<GetOrders />} />
           <Route path='delete-account' element={<DeleteAccount />} />
+          <Route path='profile' element={<Profile />} />
         </Route>
-
-
-
-
 
 
       </Routes>

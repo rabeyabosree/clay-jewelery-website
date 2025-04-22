@@ -12,7 +12,9 @@ function AdminDashboard() {
         { menu: "All Products", icon: <GrScorecard />, path: "/dashboard/all-products" },
         { menu: "All Users", icon: <MdOutlineSpaceDashboard />, path: "/dashboard/all-users" },
         { menu: "Users Activity", icon: <TbDeviceUnknown />, path: "/dashboard/users-activity" },
-        { menu: "Delete Account", icon: <GrScorecard />, path: "/dashboard/delete-account" }
+        { menu: "Orders", icon: <TbDeviceUnknown />, path: "/dashboard/orders" },
+        { menu: "Delete Account", icon: <GrScorecard />, path: "/dashboard/delete-account" },
+       
     ]
     return (
         <div className='flex'>

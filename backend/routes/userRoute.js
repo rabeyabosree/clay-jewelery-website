@@ -4,6 +4,7 @@ const nodemailer = require('nodemailer');
 const bcrypt = require("bcryptjs")
 const router = express.Router();
 const generateToken = require("../middleware/genereteToken")
+const  verifyToken = require("../middleware/verifyToken")
 
 router.post("/register", async (req, res) => {
   try {
@@ -170,6 +171,22 @@ router.post('/reset-password', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Something went wrong' });
+  }
+});
+
+router.post('/activity', verifyToken, async (req, res) => {
+  try {
+      const { action, details } = req.body;
+      const newActivity = new Activity({
+          userId: req.user.userId, // token theke user ID
+          action,
+          details,
+      });
+      await newActivity.save();
+      res.status(201).send({ message: 'Activity created successfully', activity: newActivity });
+  } catch (error) {
+      console.error(error);
+      res.status(500).send({ message: 'Server error' });
   }
 });
 

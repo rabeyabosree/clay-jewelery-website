@@ -3,7 +3,7 @@ import heroImg from '../../assets/ChatGPT_Image_Apr_20__2025__08_16_55_PM-remove
 
 function Hero() {
   return (
-    <section className="pt-20 px-4 py-3 min-h-screen flex flex-col lg:flex-row items-center justify-between container mx-auto">
+    <section className="pt-30 px-4 py-3 flex flex-col lg:flex-row items-center justify-between container mx-auto">
       
       {/* Left Content */}
       <div className="text-center lg:text-left lg:w-1/2 space-y-6">
