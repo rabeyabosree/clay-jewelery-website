@@ -93,7 +93,12 @@ export const toggleLove = createAsyncThunk(
   "products/toggleLove",
   async ({ id, userId }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/${id}/love`, { userId });
+      const response = await axios.post(`${API_URL}/${id}/love`, { userId },
+      {  headers: {
+          "Content-Type": "application/json"
+        }
+}
+      );
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || "Failed to toggle love");

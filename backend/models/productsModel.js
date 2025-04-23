@@ -8,6 +8,7 @@ const productSchema = new mongoose.Schema(
     category: { type: String, required: true },
     isOnSale: { type: Boolean, default: false },
     isBOGO: { type: Boolean, default: false },
+    featured: { type: Boolean, default: false },
     stock: {
       type: String,
     },

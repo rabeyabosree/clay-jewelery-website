@@ -1,6 +1,7 @@
 import Logo from "./Logo";
 import SearchBox from "./SearchBox";
 import DropDownMenu from './DropDownMenu';
+import NavMenu from './NavMenu';
 
 function Navbar() {
 
@@ -10,6 +11,10 @@ function Navbar() {
       <nav className="container mx-auto flex items-center justify-between gap-4" >
         <div>
           <Logo />
+        </div>
+
+        <div>
+          <NavMenu />
         </div>
 
         <div className="flex items-center gap-3">

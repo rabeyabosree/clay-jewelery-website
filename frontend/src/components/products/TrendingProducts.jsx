@@ -1,53 +1,72 @@
-import React, { useEffect } from 'react';
-import {  useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+// TrendingProducts.jsx
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
+import { fetchProducts } from '../../redux/reducers/productSlice'
+import Carousel from 'react-multi-carousel'
+import 'react-multi-carousel/lib/styles.css'
 
-function TrendingProducts() {
-
+export default function TrendingProducts() {
+  const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { items, status, error } = useSelector((state) => state.products);
+  const { items, status, error } = useSelector((state) => state.products)
+  console.log(items)
 
-  // Filter only popular products
-  const popularProducts = items.filter(product => product.isPopular);
+  useEffect(() => {
+    if (status === 'idle') dispatch(fetchProducts())
+  }, [status, dispatch])
+
+  const popularProducts = items.filter((p) => p.isPopular)
+
+  const responsive = {
+    superLargeDesktop: { breakpoint: { max: 4000, min: 3000 }, items: 5 },
+    desktop: { breakpoint: { max: 3000, min: 1024 }, items: 4 },
+    tablet: { breakpoint: { max: 1024, min: 464 }, items: 2 },
+    mobile: { breakpoint: { max: 464, min: 0 }, items: 1 },
+  }
+
+  if (status === 'loading') return <p>Loading products...</p>
+  if (status === 'failed') return <p>Error: {error}</p>
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Trending Products</h2>
-
-      {status === 'loading' && <p>Loading...</p>}
-      {status === 'failed' && <p className="text-red-500">Error: {error}</p>}
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {popularProducts.map(product => (
-          <div
-            key={product._id}
-            className=" p-4 rounded-lg shadow hover:shadow-md transition"
-          >
-            <img
-              src={product.imageUrl}
-              alt={product.title}
-              onClick={()=> navigate(`/products/${product._id}`)}
-              className="w-full h-48 object-cover rounded"
-            />
-            <h3 className="text-lg font-semibold mt-2">{product.title}</h3>
-            <p className="text-gray-600 text-sm mt-1">{product.category}</p>
-            <p className="text-blue-600 font-bold text-md mt-1">₹{product.price}</p>
-
-            <div className="flex justify-between items-center mt-3 text-sm text-gray-500">
-              <span>❤️ {product.loveCount}</span>
-              <span>🔁 {product.shareCount}</span>
-              <span>⭐ {product.rating || 0}</span>
-            </div>
+    <Carousel
+      responsive={responsive}
+      infinite={true}
+      autoPlay={true}
+      autoPlaySpeed={3000}        // 3 seconds per slide
+      keyBoardControl={true}      // let users arrow‑navigate
+      showDots={true}
+      removeArrowOnDeviceType={['mobile']}  // hide arrows on small screens
+      ssr={true}                  // if you’re pre‑rendering
+      containerClass="carousel-container"
+      dotListClass="custom-dot-list"
+      itemClass="carousel-item-padding-40-px">
+      {popularProducts.map((product) => (
+        <div
+          key={product._id}
+          onClick={() => navigate(`/products/${product._id}`)}
+          className="
+            bg-white rounded-2xl shadow-md overflow-hidden
+            flex flex-col items-center p-4
+            transform transition hover:-translate-y-1 hover:shadow-lg
+          "
+        >
+          <img
+            src={product.imageUrl}
+            alt={product.title}
+            className="w-full h-44 object-cover rounded-lg"
+          />
+          <div className="mt-3 text-center">
+            <h3 className="text-base font-semibold text-gray-800 leading-tight">
+              {product.title}
+            </h3>
+            <p className="text-sm font-medium text-red-600">
+              ${product.price}
+            </p>
           </div>
-        ))}
-      </div>
-
-      {status === 'succeeded' && popularProducts.length === 0 && (
-        <p>No trending products found.</p>
-      )}
-    </div>
-  );
+        </div>
+      ))}
+    </Carousel>
+  )
 }
-
-export default TrendingProducts;
 

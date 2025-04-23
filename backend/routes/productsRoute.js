@@ -68,20 +68,23 @@ router.get("/:id", async (req, res) => {
 });
 
 // Express route for adding reviews
-router.post('/:id/review', async (req, res) => {
+router.post("/:id/review", async (req, res) => {
   try {
     const { id } = req.params;  // Get productId from params
     const { user, comment, rating } = req.body;  // Get review data from body
 
+    // Validate product ID
     const product = await Product.findById(id);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
+    if (!product) return res.status(404).json({ error: "Product not found" });
 
-    // Ensure rating is valid before pushing
+    // Validate rating value
     if (rating < 1 || rating > 5) {
-      return res.status(400).json({ error: 'Rating must be between 1 and 5' });
+      return res.status(400).json({ error: "Rating must be between 1 and 5" });
     }
 
-    product.reviews.push({ user, comment, rating });
+    // Add the new review
+    const newReview = { user, comment, rating };
+    product.reviews.push(newReview);
 
     // Calculate the new average rating (rounded to 1 decimal place)
     product.rating = (
@@ -89,12 +92,15 @@ router.post('/:id/review', async (req, res) => {
     ).toFixed(1); // Keep one decimal place
 
     await product.save();
-    res.json({ message: 'Review added successfully', product });
+
+    // Return the updated product with reviews
+    res.json({ message: "Review added successfully", product });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
 
 router.delete('/:id/review/:reviewId', async (req, res) => {
   try {
@@ -163,10 +169,11 @@ router.post('/products/:id/add-to-cart', async (req, res) => {
 
 router.post("/:id/love", async (req, res) => {
   try {
-    const { id } = req.params
+    const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: "Invalid product ID" });
     }
+    console.log("User ID in request body:", id);
 
     const product = await Product.findById(id);
     if (!product) return res.status(404).json({ error: "Product not found" });
@@ -174,16 +181,17 @@ router.post("/:id/love", async (req, res) => {
     const userId = req.body.userId;
     if (!userId) return res.status(400).json({ error: "User ID required" });
 
-    if (product.lovedUsers.includes(userId)) {
+    const userObjectId = mongoose.Types.ObjectId(userId); // Ensure userId is converted to ObjectId
+
+    if (product.lovedUsers.some((lovedUser) => lovedUser.equals(userObjectId))) {
       // Unloved: Remove user from lovedUsers and decrease loveCount
-      product.lovedUsers = product.lovedUsers.filter((id) => id.toString() !== userId.toString());
+      product.lovedUsers = product.lovedUsers.filter((lovedUser) => !lovedUser.equals(userObjectId));
       product.loveCount = Math.max(0, product.loveCount - 1); // Prevent negative count
     } else {
       // Loved: Add user to lovedUsers and increase loveCount
-      product.lovedUsers.push(userId);
+      product.lovedUsers.push(userObjectId);
       product.loveCount += 1;
     }
-
 
     await product.save();
     res.json(product);
@@ -192,6 +200,7 @@ router.post("/:id/love", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 //  Increase Share Count
 router.post("/:id/share", async (req, res) => {

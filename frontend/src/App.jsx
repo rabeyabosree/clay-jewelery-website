@@ -15,8 +15,11 @@ import UsersActivity from './pages/admin/UsersActivity'
 import DeleteAccount from './pages/admin/DeleteAccount'
 import GetOrders from './pages/admin/GetOrders';
 import Profile from './pages/profile/Profile';
-import Products from './pages/products/Products'
 import SingleProduct from './pages/products/SingleProduct'
+import NewProducts from './components/products/NewProducts'
+import Products from './pages/products/Products';
+import ProductReviews from './pages/products/ProductReviews'
+import ReviewForm from './pages/products/ReviewForm'
 
 function App() {
 
@@ -36,6 +39,7 @@ function App() {
         <Route path='/notification' element={<Notifications />} />
         <Route path='/products' element={<Products />} />
         <Route path='/products/:id' element={<SingleProduct/>} />
+        <Route path='/products/new' element={<NewProducts/>} />
 
 
         <Route path='/dashboard' element={<AdminDashboard />}>

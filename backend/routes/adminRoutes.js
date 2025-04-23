@@ -14,7 +14,7 @@ router.post("/", upload.single("image"), async (req, res) => {
   try {
     const { 
       title, description, price, category,
-      isPopular, isOnSale, isBOGO, stock,message
+      isPopular, isOnSale, isBOGO,featured, stock,message
     } = req.body;
 
     if (!title || !description || !price || !category) {
@@ -35,6 +35,7 @@ router.post("/", upload.single("image"), async (req, res) => {
       isPopular: isPopular || false,
       isOnSale: isOnSale || false,
       isBOGO: isBOGO || false,
+      featured: featured || false,
       stock: stock || 0,
       imageUrl
     });
