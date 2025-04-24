@@ -1,121 +1,176 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProductDetails, addShare, toggleLove, addReview, addToCart, updateQuantity } from '../../redux/reducers/productSlice';
-import ProductReviews from './ReviewForm';
+import {
+  fetchProductDetails,
+  addShare,
+  toggleLove,
+  addToCart,
+  updateQuantity,
+} from '../../redux/reducers/productSlice';
 import QuantityControl from './QuantityControl';
-import { Heart, SquareArrowUpRight } from "lucide-react";
+import { Heart, SquareArrowUpRight } from 'lucide-react';
+import ProductReviews from './ProductReviews';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { FacebookShareButton, WhatsAppShareButton, LinkedinShareButton, TwitterShareButton, FacebookIcon, WhatsAppIcon, LinkedinIcon, TwitterIcon } from 'react-share';
 
 function SingleProduct() {
-  const { id } = useParams();  // Get the product ID from the URL
+  const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Select product details from the store
   const { selectedProduct, status, error } = useSelector((state) => state.products);
-  const { user } = useSelector((state) => state.user || "");
+  const { user } = useSelector((state) => state.user);
+  
+  // Track whether the share modal is open or not
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(fetchProductDetails(id));  // Dispatch an action to fetch product details by ID
+    if (status === 'idle' && id) {
+      dispatch(fetchProductDetails(id));
     }
   }, [id, dispatch, status]);
 
-  // Memoize the love status check to avoid unnecessary recalculations
-  const isLoved = useMemo(() => selectedProduct?.lovedUsers?.includes(user?.id), [selectedProduct, user]);
+  const isLoved = useMemo(() => {
+    return selectedProduct?.lovedUsers?.some(
+      (lovedUserId) => lovedUserId?.toString() === user?._id?.toString()
+    );
+  }, [selectedProduct, user]);
 
   const handleLoveClick = () => {
-    dispatch(toggleLove({ id: selectedProduct._id, userId: user.id }));
+    if (user?._id) {
+      dispatch(toggleLove({ id: selectedProduct._id, userId: user._id }));
+    } else {
+      toast.error('You need to be logged in to love this product!');
+    }
   };
 
   const handleShareClick = () => {
-    const productUrl = window.location.href;
-
-    // Check if Clipboard API is supported
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(productUrl)
-        .then(() => {
-          toast.success("Link copied to clipboard!");
-          dispatch(addShare(selectedProduct._id))
-            .unwrap()
-            .then(() => toast.success("Share count updated!"))
-            .catch((error) => toast.error(`Failed to update share count: ${error.message}`));
-        })
-        .catch((err) => {
-          toast.error("Failed to copy the link to clipboard!");
-          console.error(err);
-        });
-    } else {
-      toast.error("Clipboard API is not supported in this browser. Please copy the URL manually.");
-      console.warn("Clipboard API not supported.");
-    }
+    setIsShareModalOpen(!isShareModalOpen);
   };
 
   const addToCartHandle = () => {
     dispatch(addToCart(selectedProduct));
-    navigate("/cart");
+    navigate('/cart');
   };
 
   const handleQuantityChange = (productId, quantity) => {
-    if (quantity < 0) return; // Prevent negative values
+    if (quantity < 1) return;
     dispatch(updateQuantity({ productId, quantity }));
   };
 
-  const handleUpdateQuantity = (productId, change) => {
-    dispatch(updateQuantity({ productId, quantity: change }));
+  const handleUpdateQuantity = (productId, delta) => {
+    const currentQty = selectedProduct?.quantity || 1;
+    const newQty = currentQty + delta;
+    if (newQty < 1) return;
+    dispatch(updateQuantity({ productId, quantity: newQty }));
   };
 
+  // Loading or Error States
+  if (status === 'loading') return <div className="text-center py-10">Loading product...</div>;
+  if (status === 'failed') return <div className="text-center py-10 text-red-600">Error: {error}</div>;
+  if (!selectedProduct) return <div className="text-center py-10">Product not found.</div>;
+
   return (
-    <div className="max-w-4xl mx-auto bg-white p-6 md:p-8 border my-2 relative">
-      <div className="flex flex-col md:flex-row items-center justify-between border gap-4 group p-4">
-        <div className="p-6 md:p-8 w-full md: flex flex-col items-center md:items-start border">
-          <img src={selectedProduct?.imageUrl} alt={selectedProduct?.title} className="rounded-lg w-full h-60 object-cover" />
+    <div className="max-w-4xl mx-auto bg-white p-6 md:p-8 border my-4 rounded-lg relative">
+      <div className="flex flex-col md:flex-row gap-4">
+        {/* Image Section */}
+        <div className="w-full md:w-1/2">
+          <img
+            src={selectedProduct.imageUrl}
+            alt={selectedProduct.title}
+            className="rounded-lg w-full h-60 object-cover"
+          />
         </div>
 
-        <div className="p-6 md:p-8 w-full md: flex flex-col items-center md:items-start border">
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900 text-center md:text-left">{selectedProduct?.title}</h1>
-          <p>{selectedProduct?.category}</p>
-          <p className="text-xl md:text-2xl font-semibold text-blue-700 mt-2 text-center md:text-left">{selectedProduct?.price}</p>
-          <ProductReviews product={selectedProduct} id={id} />
-          <p className="text-gray-600 mt-4 text-base md:text-[15px] leading-relaxed text-center md:text-left">{selectedProduct?.description}</p>
+        {/* Product Info Section */}
+        <div className="w-full md:w-1/2 flex flex-col justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">{selectedProduct.title}</h1>
+            <p className="text-sm text-gray-600 mb-1">{selectedProduct.category}</p>
+            <p className="text-xl font-semibold text-blue-700 mt-2">{selectedProduct.price}</p>
 
-          <div className="mt-6 flex flex-col sm:flex-row gap-4 w-full justify-center sm:justify-start">
+            <ProductReviews product={selectedProduct} id={id} />
+
+            <p className="text-gray-700 mt-4 text-sm leading-relaxed">
+              {selectedProduct.description}
+            </p>
+          </div>
+
+          {/* Controls */}
+          <div className="mt-6 flex flex-col sm:flex-row gap-4">
             <QuantityControl
-              productId={selectedProduct?._id}
-              quantity={selectedProduct?.quantity}
+              productId={selectedProduct._id}
+              quantity={selectedProduct.quantity}
               onIncrease={handleUpdateQuantity}
               onDecrease={handleUpdateQuantity}
               onChange={handleQuantityChange}
             />
+
             <button
               onClick={addToCartHandle}
-              className="bg-gray-700 text-white py-3 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 transform hover:scale-105 w-full sm:w-auto"
+              className="bg-gray-800 text-white py-3 px-6 rounded-lg shadow hover:bg-blue-700 transition-transform transform hover:scale-105 w-full sm:w-auto"
             >
               Add to Cart
-            </button>
-
-            <button
-              onClick={handleLoveClick}
-              aria-label={isLoved ? "Unfavorite" : "Favorite"}
-              className={`absolute top-4 right-4 text-3xl ${isLoved ? "text-red-600" : "text-gray-400"} transition duration-300 ease-in-out`}
-            >
-              <Heart />
-            </button>
-
-            <button
-              onClick={handleShareClick}
-              className="bg-gray-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition duration-300 transform hover:scale-110 w-full sm:w-auto"
-            >
-              <SquareArrowUpRight />
             </button>
           </div>
         </div>
       </div>
+
+      {/* Love and Share */}
+      <div className="absolute top-4 right-4 flex gap-3">
+        <button
+          onClick={handleLoveClick}
+          aria-label={isLoved ? "Unfavorite" : "Favorite"}
+          className={`text-3xl ${isLoved ? 'text-red-600' : 'text-gray-400'} transition duration-300`}
+        >
+          <Heart />
+        </button>
+        
+        <button
+          onClick={handleShareClick}
+          className="bg-gray-500 text-white p-3 rounded-full hover:bg-green-600 transition transform hover:scale-110"
+        >
+          <SquareArrowUpRight />
+        </button>
+      </div>
+
+      {/* Share Modal */}
+      {isShareModalOpen && (
+        <div className="fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Share this product</h2>
+            <div className="flex justify-between gap-4">
+              <FacebookShareButton url={window.location.href}>
+                <FacebookIcon size={40} round />
+              </FacebookShareButton>
+              <WhatsAppShareButton url={window.location.href}>
+                <WhatsAppIcon size={40} round />
+              </WhatsAppShareButton>
+              <LinkedinShareButton url={window.location.href}>
+                <LinkedinIcon size={40} round />
+              </LinkedinShareButton>
+              <TwitterShareButton url={window.location.href}>
+                <TwitterIcon size={40} round />
+              </TwitterShareButton>
+            </div>
+            <button
+              onClick={() => setIsShareModalOpen(false)}
+              className="mt-4 w-full py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 export default SingleProduct;
+
+
 
 
 

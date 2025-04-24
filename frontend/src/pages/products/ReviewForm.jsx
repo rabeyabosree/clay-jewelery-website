@@ -1,105 +1,124 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { addReview, fetchProductDetails } from "../../redux/reducers/productSlice";
+import {
+  addReview,
+  deleteReview,
+  fetchProductDetails,
+} from "../../redux/reducers/productSlice";
 import { SlStar } from "react-icons/sl";
+import { MdDeleteOutline } from "react-icons/md";
 
-const ReviewForm = ({id}) => {
+const ReviewForm = ({ id, reviews }) => {
   const dispatch = useDispatch();
-  const [comment, setComment] = useState("");
-  const [rating, setRating] = useState(5); // Default rating
-  const [showFullForm, setShowFullForm] = useState(false); // For toggling the form visibility
-  const { status } = useSelector((state) => state.products);
   const { user } = useSelector((state) => state.user);
+  const { status } = useSelector((state) => state.products);
 
-
-  useEffect(() => {
-    setShowFullForm(false); // Reset the form visibility on component mount
-  }, []);
+  const [comment, setComment] = useState("");
+  const [rating, setRating] = useState(5);
 
   const handleReviewSubmit = (e) => {
     e.preventDefault();
 
-    if (!id) {
-      console.log("Product ID is missing!");
-      return;
-    }
-
-    if (!comment.trim()) {
-      toast.error("Review cannot be empty!");
-      return;
-    }
-
-    if (rating === 0) {
-      toast.error("Please select a rating!");
-      return;
-    }
+    if (!comment.trim()) return toast.error("Write something!");
+    if (!rating) return toast.error("Select a rating!");
 
     const reviewData = { user: user.name, comment, rating, userId: user.id };
 
     dispatch(addReview({ id, ...reviewData }))
       .unwrap()
       .then(() => {
-        dispatch(fetchProductDetails(id)); // Refresh product after review
-        toast.success("Review added successfully!");
-        setComment(""); // Clear input field
-        setRating(5); // Reset rating
-        setShowFullForm(false); // Hide the form after submission
+        toast.success("Thanks for your review!");
+        dispatch(fetchProductDetails(id));
+        setComment("");
+        setRating(5);
       })
-      .catch((err) => {
-        const errorMessage = err?.message || "Failed to submit review";
-        toast.error(errorMessage);
-      });
+      .catch(() => toast.error("Couldn't submit review"));
+  };
+
+  const handleDelete = (reviewId) => {
+    if (window.confirm("Are you sure you want to delete this review?")) {
+      dispatch(deleteReview({ id, reviewId }))
+        .unwrap()
+        .then(() => {
+          toast.success("Review deleted!");
+          dispatch(fetchProductDetails(id));
+        })
+        .catch(() => toast.error("Failed to delete review"));
+    }
   };
 
   return (
-    <div className="mt-6 p-6 bg-white border">
-      <h2 className="text-2xl font-semibold mb-4 text-gray-800">Add a Review</h2>
-
-      {!showFullForm ? (
+    <div className="mt-4">
+      {/* Review Form */}
+      <form onSubmit={handleReviewSubmit} className="mb-4">
         <textarea
-          className="w-full p-3 border rounded-lg mb-4 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
-          rows="1"
-          placeholder="Click here to write your review..."
+          rows="2"
+          className="w-full p-2 text-sm border rounded-md focus:ring-2 focus:ring-blue-500"
+          placeholder="Write a review..."
           value={comment}
-          onClick={() => setShowFullForm(true)} // Show full form when clicked
           onChange={(e) => setComment(e.target.value)}
-        ></textarea>
-      ) : (
-        <form onSubmit={handleReviewSubmit}>
-          <textarea
-            className="w-full p-3 border rounded-lg mb-4 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows="4"
-            placeholder="Write your review..."
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          ></textarea>
-
-          <div className="flex items-center space-x-4 mb-4">
-            <label className="text-gray-700 font-medium">Rating:</label>
-            <div className="flex space-x-1">
-              {[1, 2, 3, 4, 5].map((num) => (
-                <SlStar
-                  key={num}
-                  className={`cursor-pointer ${num <= rating ? "text-yellow-500" : "text-gray-300"}`}
-                  onClick={() => setRating(num)} // Update rating when star is clicked
-                />
-              ))}
-            </div>
+        />
+        <div className="flex items-center justify-between mt-2">
+          <div className="flex space-x-1">
+            {[1, 2, 3, 4, 5].map((num) => (
+              <SlStar
+                key={num}
+                onClick={() => setRating(num)}
+                className={`cursor-pointer text-lg ${
+                  num <= rating ? "text-yellow-500" : "text-gray-300"
+                }`}
+              />
+            ))}
           </div>
-          
           <button
             type="submit"
-            className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out"
             disabled={status === "loading"}
+            className="text-sm px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            {status === "loading" ? "Submitting..." : "Submit Review"}
+            {status === "loading" ? "Submitting..." : "Post"}
           </button>
-        </form>
-      )}
+        </div>
+      </form>
+
+      {/* Reviews */}
+      <div className="space-y-2">
+        {reviews?.length === 0 && (
+          <p className="text-gray-500 text-sm">No reviews yet.</p>
+        )}
+
+        {reviews?.map((r) => (
+          <div
+            key={r._id}
+            className="relative border p-3 rounded-md bg-gray-50 flex justify-between items-start"
+          >
+            <div>
+              <div className="text-sm font-semibold text-gray-700">{r.user}</div>
+              <div className="flex items-center text-yellow-500 text-xs mb-1">
+                {[...Array(r.rating)].map((_, i) => (
+                  <SlStar key={i} />
+                ))}
+              </div>
+              <p className="text-sm text-gray-600">{r.comment}</p>
+            </div>
+
+            {r.userId === user.id && (
+              <button
+                onClick={() => handleDelete(r._id)}
+                className="text-red-500 hover:text-red-700 text-xl ml-4"
+              >
+                <MdDeleteOutline />
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
 
 export default ReviewForm;
+
+
+
 

@@ -50,4 +50,8 @@ export const blogsData = [
       "slug": "the-environmental-benefits-of-choosing-clay-jewelry"
     }
   ]
+
+
+
+
   

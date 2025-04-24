@@ -101,7 +101,6 @@ router.post("/:id/review", async (req, res) => {
   }
 });
 
-
 router.delete('/:id/review/:reviewId', async (req, res) => {
   try {
     const { id, reviewId } = req.params;
@@ -129,33 +128,6 @@ router.delete('/:id/review/:reviewId', async (req, res) => {
   }
 });
 
-router.put('/:id/review/:reviewId', async (req, res) => {
-  try {
-    const { id, reviewId } = req.params;
-    const { comment, rating } = req.body;
-
-    const product = await Product.findById(id);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-
-    const review = product.reviews.find((rev) => rev._id.toString() === reviewId);
-    if (!review) return res.status(404).json({ error: 'Review not found' });
-
-    review.comment = comment || review.comment;
-    review.rating = rating || review.rating;
-
-    // Update average rating
-    product.rating = (
-      product.reviews.reduce((acc, r) => acc + r.rating, 0) / product.reviews.length
-    ).toFixed(1);
-
-    await product.save();
-    res.json({ message: 'Review updated successfully', product });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
 // Add to Cart Route
 router.post('/products/:id/add-to-cart', async (req, res) => {
   try {
@@ -173,7 +145,6 @@ router.post("/:id/love", async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: "Invalid product ID" });
     }
-    console.log("User ID in request body:", id);
 
     const product = await Product.findById(id);
     if (!product) return res.status(404).json({ error: "Product not found" });
@@ -181,7 +152,7 @@ router.post("/:id/love", async (req, res) => {
     const userId = req.body.userId;
     if (!userId) return res.status(400).json({ error: "User ID required" });
 
-    const userObjectId = mongoose.Types.ObjectId(userId); // Ensure userId is converted to ObjectId
+    const userObjectId = new mongoose.Types.ObjectId(userId); // Ensure userId is converted to ObjectId
 
     if (product.lovedUsers.some((lovedUser) => lovedUser.equals(userObjectId))) {
       // Unloved: Remove user from lovedUsers and decrease loveCount
@@ -200,7 +171,6 @@ router.post("/:id/love", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
 
 //  Increase Share Count
 router.post("/:id/share", async (req, res) => {

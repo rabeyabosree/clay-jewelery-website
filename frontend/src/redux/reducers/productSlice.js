@@ -49,21 +49,6 @@ export const addReview = createAsyncThunk(
   }
 );
 
-export const updateReview = createAsyncThunk(
-  'products/updateReview',
-  async ({ productId, reviewId, comment, rating }, { rejectWithValue }) => {
-    try {
-      const response = await axios.put(`${API_URL}/${productId}/review/${reviewId}`, {
-        comment,
-        rating
-      });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.error || 'Failed to update review');
-    }
-  }
-);
-
 export const deleteReview = createAsyncThunk(
   'products/deleteReview',
   async ({ id, reviewId }, { rejectWithValue }) => {
@@ -75,7 +60,6 @@ export const deleteReview = createAsyncThunk(
     }
   }
 );
-
 // Track product view
 export const trackView = createAsyncThunk(
   'products/trackView',
