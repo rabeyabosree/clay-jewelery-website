@@ -18,6 +18,9 @@ import { useNavigate } from "react-router-dom";
 
 function DropDownMenu() {
   const { user } = useSelector((state) => state.user || "");
+  const { unseenCount } = useSelector((state) => state.notifications);
+ 
+  
   console.log(user)
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -60,8 +63,17 @@ function DropDownMenu() {
 
         {/* Notifications */}
         <button className="relative" onClick={() => navigate("/notification")}>
-          <Bell size={24} className="text-gray-700 hover:text-blue-500" />
-        </button>
+              <Bell size={24} className="text-gray-700 hover:text-blue-500" />
+              <span
+                className={`absolute -top-1 -right-2 rounded-full ${
+                  unseenCount > 0
+                    ? "bg-red-600 text-white w-5 h-5 text-xs flex items-center justify-center"
+                    : "bg-transparent"
+                }`}
+              >
+                {unseenCount > 0 ? unseenCount : null}
+              </span>
+            </button>
 
         {/* User Dropdown */}
         {user ? (

@@ -2,6 +2,7 @@ import React from 'react';
 import { X } from "lucide-react";
 import { CiSearch } from "react-icons/ci";
 import SuggestedQuery from './SuggestedQuery';
+import SearchResult from './SearchResult';
 
 function Search({ open, setOpen, query, setQuery }) {
   // Form submit handler
@@ -51,7 +52,7 @@ function Search({ open, setOpen, query, setQuery }) {
           {/* Results / Suggestions */}
           <div className="flex-1 overflow-y-auto">
             {query ? (
-              <div>Search Results for: {query}</div>
+                <SearchResult query={query} />
             ) : (
               <SuggestedQuery />
             )}

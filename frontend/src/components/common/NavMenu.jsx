@@ -11,7 +11,7 @@ function NavMenu() {
 
   return (
     <nav className="bg-trasporent text-black">
-      <div className="max-w-screen-xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className={" flex items-center justify-between"}>
 
         {/* Hamburger Icon (Mobile) */}
         <div className="lg:hidden">

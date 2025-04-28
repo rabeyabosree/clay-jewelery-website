@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 function CategoryPage() {
   const { items } = useSelector((state) => state.products);
@@ -21,7 +22,7 @@ function CategoryPage() {
                 key={index}
                 className="min-w-[150px] p-3 bg-blue-100 rounded-md text-center shrink-0"
               >
-                {category}
+                <Link to={`/category/${category}`}>{category}</Link>
               </li>
             ))}
           </ul>
@@ -34,3 +35,4 @@ function CategoryPage() {
 }
 
 export default CategoryPage;
+

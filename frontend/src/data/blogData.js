@@ -5,7 +5,7 @@ export const blogsData = [
       "date": "2025-04-22",
       "category": "Clay Jewelry",
       "content": "Clay jewelry is more than just accessories; it's a form of art that transcends time and trends. Handmade pieces have a unique charm that mass-produced items cannot replicate. These pieces are often inspired by nature, culture, and personal stories, which makes each item truly one-of-a-kind.",
-      "image": "https://via.placeholder.com/600x400.png?text=Handmade+Clay+Jewelry",
+      "image": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiQ0lR_dmumIsaHf2dcUolhyphenhyphendOMPsOWJcuEo9NMgta73562S2SZvJu5x_pmLgVo0UYj6NwuTvhQHva7tqTm4zoV7qgglSn0cb5ootLaSB3i4MhUkTxRnJCkXzt4X6emyGexdnTDr8j__HA/s1600/olga-geometric-polymer-clay-necklace.jpg",
       "tags": ["Handmade", "Jewelry", "Timeless", "Art"],
       "slug": "the-beauty-of-handmade-clay-jewelry"
     },
@@ -35,7 +35,7 @@ export const blogsData = [
       "date": "2025-04-10",
       "category": "Trends",
       "content": "Clay jewelry continues to evolve with new trends emerging every year. In 2025, we're seeing a rise in bold colors, geometric shapes, and nature-inspired designs. This post explores the top trends to look out for and how you can incorporate them into your collection.",
-      "image": "https://via.placeholder.com/600x400.png?text=Trends+in+Clay+Jewelry+2025",
+      "image": "https://www.istockphoto.com/photo/woman-designing-jewelry-in-her-atelier-gm1351260953-427077716?searchscope=image%2Cfilm",
       "tags": ["Trends", "Jewelry", "2025"],
       "slug": "top-trends-in-clay-jewelry-for-2025"
     },

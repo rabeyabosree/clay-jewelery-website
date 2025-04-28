@@ -13,17 +13,22 @@ import { Heart, SquareArrowUpRight } from 'lucide-react';
 import ProductReviews from './ProductReviews';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { FacebookShareButton, WhatsAppShareButton, LinkedinShareButton, TwitterShareButton, FacebookIcon, WhatsAppIcon, LinkedinIcon, TwitterIcon } from 'react-share';
+import {
+  FacebookShareButton,
+  WhatsappShareButton,
+  LinkedinShareButton,
+  TwitterShareButton,
+} from 'react-share';
+import { FaFacebook, FaWhatsapp, FaLinkedin, FaTwitter } from 'react-icons/fa';
 
 function SingleProduct() {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [quantity, setQuantity] = useState(1); // Local state for quantity
 
   const { selectedProduct, status, error } = useSelector((state) => state.products);
   const { user } = useSelector((state) => state.user);
-  
-  // Track whether the share modal is open or not
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   useEffect(() => {
@@ -51,23 +56,23 @@ function SingleProduct() {
   };
 
   const addToCartHandle = () => {
-    dispatch(addToCart(selectedProduct));
+    dispatch(addToCart({ ...selectedProduct, quantity }));
     navigate('/cart');
   };
 
-  const handleQuantityChange = (productId, quantity) => {
-    if (quantity < 1) return;
-    dispatch(updateQuantity({ productId, quantity }));
+  // Update quantity when the user changes it
+  const handleQuantityChange = (productId, newQuantity) => {
+    if (newQuantity < 1) return; // Prevent negative or zero quantities
+    setQuantity(newQuantity); // Update local state
   };
 
+  // Handle increasing or decreasing the quantity
   const handleUpdateQuantity = (productId, delta) => {
-    const currentQty = selectedProduct?.quantity || 1;
-    const newQty = currentQty + delta;
-    if (newQty < 1) return;
-    dispatch(updateQuantity({ productId, quantity: newQty }));
+    const newQty = quantity + delta;
+    if (newQty < 1) return; // Prevent negative or zero quantities
+    setQuantity(newQty); // Update local state
   };
 
-  // Loading or Error States
   if (status === 'loading') return <div className="text-center py-10">Loading product...</div>;
   if (status === 'failed') return <div className="text-center py-10 text-red-600">Error: {error}</div>;
   if (!selectedProduct) return <div className="text-center py-10">Product not found.</div>;
@@ -102,10 +107,10 @@ function SingleProduct() {
           <div className="mt-6 flex flex-col sm:flex-row gap-4">
             <QuantityControl
               productId={selectedProduct._id}
-              quantity={selectedProduct.quantity}
-              onIncrease={handleUpdateQuantity}
-              onDecrease={handleUpdateQuantity}
-              onChange={handleQuantityChange}
+              quantity={quantity} // Pass the local quantity
+              onIncrease={handleUpdateQuantity} // Increase function
+              onDecrease={handleUpdateQuantity} // Decrease function
+              onChange={handleQuantityChange} // Change quantity directly
             />
 
             <button
@@ -141,18 +146,18 @@ function SingleProduct() {
         <div className="fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Share this product</h2>
-            <div className="flex justify-between gap-4">
+            <div className="flex justify-between gap-4 text-3xl">
               <FacebookShareButton url={window.location.href}>
-                <FacebookIcon size={40} round />
+                <FaFacebook className="text-blue-600 hover:scale-110 transition" />
               </FacebookShareButton>
-              <WhatsAppShareButton url={window.location.href}>
-                <WhatsAppIcon size={40} round />
-              </WhatsAppShareButton>
+              <WhatsappShareButton url={window.location.href}>
+                <FaWhatsapp className="text-green-500 hover:scale-110 transition" />
+              </WhatsappShareButton>
               <LinkedinShareButton url={window.location.href}>
-                <LinkedinIcon size={40} round />
+                <FaLinkedin className="text-blue-700 hover:scale-110 transition" />
               </LinkedinShareButton>
               <TwitterShareButton url={window.location.href}>
-                <TwitterIcon size={40} round />
+                <FaTwitter className="text-blue-400 hover:scale-110 transition" />
               </TwitterShareButton>
             </div>
             <button
@@ -169,6 +174,10 @@ function SingleProduct() {
 }
 
 export default SingleProduct;
+
+
+
+
 
 
 

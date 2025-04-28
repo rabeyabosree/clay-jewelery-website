@@ -1,7 +1,9 @@
 import React from 'react';
 import heroImg from '../../assets/ChatGPT_Image_Apr_20__2025__08_16_55_PM-removebg-preview.png';
+import { useNavigate } from 'react-router-dom';
 
 function Hero() {
+  const navigate = useNavigate()
   return (
     <section className="pt-30 px-4 py-3 flex flex-col lg:flex-row items-center justify-between container mx-auto">
       
@@ -15,7 +17,7 @@ function Hero() {
           Discover the beauty of handmade clay jewellery – where elegance meets creativity. Each piece is uniquely crafted with love and attention to detail, perfect for expressing your individuality.
         </p>
 
-        <button className="px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition">
+        <button onClick={()=> navigate("/products")} className="px-6 py-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition">
           Explore Collection
         </button>
       </div>

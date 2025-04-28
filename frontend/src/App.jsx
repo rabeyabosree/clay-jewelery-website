@@ -20,6 +20,13 @@ import NewProducts from './components/products/NewProducts'
 import Products from './pages/products/Products';
 import ProductReviews from './pages/products/ProductReviews'
 import ReviewForm from './pages/products/ReviewForm'
+import CategoryProduct from './components/products/CategoryProduct'
+import OrderHistory from './pages/orders/OrderHistory'
+import WishList from './pages/wishlist/WishList'
+import TermsAndConditions from './pages/termAndsecurity/TermsAndConditions'
+import PrivacyPolicy from './pages/termAndsecurity/PrivacyPolicy'
+import ReturnPolicy from './pages/termAndsecurity/ReturnPolicy '
+import ContactUs from './pages/contact/ContactUs'
 
 function App() {
 
@@ -38,8 +45,18 @@ function App() {
         <Route path='/cart' element={<Cart />} />
         <Route path='/notification' element={<Notifications />} />
         <Route path='/products' element={<Products />} />
-        <Route path='/products/:id' element={<SingleProduct/>} />
-        <Route path='/products/new' element={<NewProducts/>} />
+        <Route path='/products/:id' element={<SingleProduct />} />
+        <Route path='/products/new' element={<NewProducts />} />
+        <Route path="/category/:categoryName" element={<CategoryProduct />} />
+        <Route path="/orders/:userId" element={<OrderHistory />} />
+        <Route path="/wishlist" element={<WishList />} />
+        <Route path="/terms-condition" element={<TermsAndConditions />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/return-policy" element={<ReturnPolicy />} />
+        <Route path="/contact" element={<ContactUs />} />
+
+
+
 
 
         <Route path='/dashboard' element={<AdminDashboard />}>

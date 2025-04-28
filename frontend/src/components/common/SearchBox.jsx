@@ -8,7 +8,7 @@ function SearchBox() {
   return (
     <>
       <div className="relative z-50">
-        <div className="h-full  py-8 flex flex-col gap-4">
+        <div className="h-full  py-4 flex flex-col gap-4">
           <Search
             open={isOpen}
             setOpen={setIsOpen}
